@@ -3,6 +3,10 @@ import EventsList from "../components/EventsList.jsx";
 
 const EventsPage = () => {
   const data = useLoaderData();
+
+  if(data.isError){
+    return <p>{data.message}</p>
+  }
   const events = data.events;
   return (
     <>
@@ -14,10 +18,10 @@ const EventsPage = () => {
 export default EventsPage;
 
 export const loader = async () => {
-  const responce = await fetch("http://localhost:8080/events");
+  const responce = await fetch("http://localhost:8080/eventspp");
 
   if (!responce.ok) {
-    //.....
+    return {isError:true , message: "Could not fetch events"}
   } else {
     return responce;
   }
