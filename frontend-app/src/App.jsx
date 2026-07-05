@@ -6,12 +6,14 @@ import EventsPage, { loader as eventsLoader } from "./pages/Events";
 import EventDetailPage from "./pages/EventDetail";
 import NewEventPage from "./pages/NewEvent";
 import EditEventPage from "./pages/EditEvent";
+import ErrorPage from "./pages/Error";
 
 const App = () => {
   const router = createBrowserRouter([
     {
       path: "/", // with the '/' only is called absolute path
       element: <RootLayout />,
+      errorElement:<ErrorPage/>,
       children: [
         { index: true, element: <HomePage /> }, // this is called index route
 

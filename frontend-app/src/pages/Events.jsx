@@ -4,9 +4,9 @@ import EventsList from "../components/EventsList.jsx";
 const EventsPage = () => {
   const data = useLoaderData();
 
-  if(data.isError){
-    return <p>{data.message}</p>
-  }
+  // ex.1 if(data.isError){
+  //   return <p>{data.message}</p>
+  // }
   const events = data.events;
   return (
     <>
@@ -18,10 +18,11 @@ const EventsPage = () => {
 export default EventsPage;
 
 export const loader = async () => {
-  const responce = await fetch("http://localhost:8080/eventspp");
+  const responce = await fetch("http://localhost:8080/events");
 
   if (!responce.ok) {
-    return {isError:true , message: "Could not fetch events"}
+    // return {isError:true , message: "Could not fetch events"} "ex.1"
+    throw {message: "Could not fetch events"}
   } else {
     return responce;
   }
