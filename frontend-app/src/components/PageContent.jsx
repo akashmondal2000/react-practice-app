@@ -1,3 +1,5 @@
+import classes from './PageContent.module.css';
+
 const PageContent = ({ title, children }) => {
   return (
     <div className={classes.content}>
@@ -8,3 +10,4 @@ const PageContent = ({ title, children }) => {
 };
 
 export default PageContent;
+  
