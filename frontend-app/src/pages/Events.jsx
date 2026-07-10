@@ -18,13 +18,16 @@ const EventsPage = () => {
 export default EventsPage;
 
 export const loader = async () => {
-  const responce = await fetch("http://localhost:8080/eventsgfg");
+  const responce = await fetch("http://localhost:8080/events");
 
   if (!responce.ok) {
     // return {isError:true , message: "Could not fetch events"} "ex.1"
     throw new Response(JSON.stringify({message:'Could not fetch events.'}),{
       status:500,
     })
+
+    // return json({message:'Could not fetch events.'},{status:500})
+    /* json() is a function that creates a responce object that includes data in the json format */
   } else {
     return responce;
   }
