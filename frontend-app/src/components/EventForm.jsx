@@ -1,30 +1,58 @@
-import { useNavigate } from 'react-router';
+import { useNavigate, Form } from "react-router";
 
-import classes from './EventForm.module.css';
+import classes from "./EventForm.module.css";
 
 function EventForm({ method, event }) {
   const navigate = useNavigate();
   function cancelHandler() {
-    navigate('..');
+    navigate("..");
   }
 
   return (
-    <form className={classes.form}>
+    /* this "Form" tag will make sure that the browser default of sending a request to the backend will be omitted
+    but it will take that request that would have been sent, and give it to your action. 
+    and that pretty useful because thet request will contain all the data was submitted as part of the form    
+    */
+    <Form method="POST" className={classes.form}>
       <p>
         <label htmlFor="title">Title</label>
-        <input id="title" type="text" name="title" required defaultValue={ event ? event.title : '' } />
+        <input
+          id="title"
+          type="text"
+          name="title"
+          required
+          defaultValue={event ? event.title : ""}
+        />
       </p>
       <p>
         <label htmlFor="image">Image</label>
-        <input id="image" type="url" name="image" required defaultValue={ event ? event.image : '' } />
+        <input
+          id="image"
+          type="url"
+          name="image"
+          required
+          defaultValue={event ? event.image : ""}
+        />
       </p>
       <p>
         <label htmlFor="date">Date</label>
-        <input id="date" type="date" name="date" required defaultValue={ event ? event.date : '' } />
+        <input
+          id="date"
+          type="date"
+          name="date"
+          required
+          defaultValue={event ? event.date : ""}
+        />
       </p>
       <p>
         <label htmlFor="description">Description</label>
-        <textarea id="description" name="description" rows="5" required defaultValue={ event ? event.description : '' }/>
+        <textarea
+          id="description"
+          name="description"
+          rows="5"
+          required
+          defaultValue={event ? event.description : ""}
+        />
       </p>
       <div className={classes.actions}>
         <button type="button" onClick={cancelHandler}>
@@ -32,7 +60,7 @@ function EventForm({ method, event }) {
         </button>
         <button>Save</button>
       </div>
-    </form>
+    </Form>
   );
 }
 
