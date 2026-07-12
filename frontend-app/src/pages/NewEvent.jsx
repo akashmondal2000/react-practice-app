@@ -27,6 +27,11 @@ export const action = async ({ request, params }) => {
     body: JSON.stringify(eventData),
   });
 
+  /* 422 is the validation error that i set on by backend code */ 
+  if(responce.status === 422){
+    return responce;
+  }
+
   if (!responce.ok) {
     throw new Response(
       JSON.stringify({

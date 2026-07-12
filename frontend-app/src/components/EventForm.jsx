@@ -1,11 +1,12 @@
-import { useNavigate, Form, useNavigation } from "react-router";
+import { useNavigate, Form, useNavigation, useActionData } from "react-router";
 
 import classes from "./EventForm.module.css";
 
 function EventForm({ method, event }) {
+  const data = useActionData();
   const navigation = useNavigation();
-  
-  const isSubmitting = navigation.state === 'submitting';
+
+  const isSubmitting = navigation.state === "submitting";
 
   const navigate = useNavigate();
   function cancelHandler() {
@@ -18,6 +19,13 @@ function EventForm({ method, event }) {
     and that pretty useful because thet request will contain all the data was submitted as part of the form    
     */
     <Form method="POST" className={classes.form}>
+      {data && data.errors && (
+        <ul>
+          {Object.values(data.errors).map((err) => (
+            <li key={err}>{err}</li>
+          ))}
+        </ul>
+      )}
       <p>
         <label htmlFor="title">Title</label>
         <input
@@ -59,10 +67,12 @@ function EventForm({ method, event }) {
         />
       </p>
       <div className={classes.actions}>
-        <button type="button" onClick={cancelHandler} disabled={isSubmitting} >
+        <button type="button" onClick={cancelHandler} disabled={isSubmitting}>
           Cancel
         </button>
-        <button disabled={isSubmitting}>{ isSubmitting ? " Submitting...": "Save"}</button>
+        <button disabled={isSubmitting}>
+          {isSubmitting ? " Submitting..." : "Save"}
+        </button>
       </div>
     </Form>
   );
