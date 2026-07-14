@@ -1,4 +1,4 @@
-import { useNavigate, Form, useNavigation, useActionData } from "react-router";
+import { useNavigate, Form, useNavigation, useActionData,redirect } from "react-router";
 
 import classes from "./EventForm.module.css";
 
@@ -18,7 +18,7 @@ function EventForm({ method, event }) {
     but it will take that request that would have been sent, and give it to your action. 
     and that pretty useful because thet request will contain all the data was submitted as part of the form    
     */
-    <Form method="POST" className={classes.form}>
+    <Form method={method} className={classes.form}>
       {data && data.errors && (
         <ul>
           {Object.values(data.errors).map((err) => (
@@ -79,3 +79,52 @@ function EventForm({ method, event }) {
 }
 
 export default EventForm;
+
+
+export const action = async ({ request, params }) => {
+  /*hare we can extract the method through the 'request' */
+  const method = request.method;
+  /*Extract all form data*/ 
+  const data = await request.formData();
+  const eventData = {
+    title: data.get("title"),
+    image: data.get("image"),
+    date: data.get("date"),
+    description: data.get("description"),
+  };
+
+  let url = "http://localhost:8080/events"
+
+  if( method === "PATCH" ){
+    const eventId = params.eventId;
+    url = "http://localhost:8080/events/"+eventId;
+  } 
+
+  /* send request to the backend*/ 
+  const responce = await fetch(url, {
+    method: method,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(eventData),
+  });
+
+  /* 422 is the validation error that i set on by backend code */ 
+  if(responce.status === 422){
+    return responce;
+  }
+
+  if (!responce.ok) {
+    throw new Response(
+      JSON.stringify({
+        message: "Could not save events.",
+      }),
+      {
+        status: 500,
+      },
+    );
+  }
+
+  return redirect('/events');
+};
+
