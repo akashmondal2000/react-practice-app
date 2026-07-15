@@ -1,24 +1,51 @@
-import { useLoaderData } from "react-router";
+import { Suspense } from "react";
+import { useLoaderData, Await } from "react-router";
 import EventsList from "../components/EventsList.jsx";
 
 const EventsPage = () => {
-  const data = useLoaderData();
+  // const data = useLoaderData();
+  const { events } =  useLoaderData();
+  /*
+  defer data:-
+  const { events } =  useLoaderData()
+  */ 
 
   // ex.1 if(data.isError){
   //   return <p>{data.message}</p>
   // }
-  const events = data.events;
+  // const events = data.events;
   return (
     <>
-      <EventsList events={events} />
+    <Suspense fallback={<p style={{textAlign:"center"}}>Loading....</p>}>
+      <Await resolve={events}>
+        {(loadedEvents)=> <EventsList events={loadedEvents}/>}
+      </Await>
+    </Suspense>
+
+      {/* defer data use :- 
+          return 
+          <Suspense fallback={<p className="text-center">Loading....</p>}>
+            <Await resolve={events}>
+              {
+                (loadedEvents)=> <EventsList events={loadedEvents} />
+              } 
+            </Await>
+          </Suspense>
+      */}
     </>
   );
 };
 
+/* 
+  Defenation of Suspense component :- 
+  "Suspense" component is a component which can be used is certain setuations  
+  to show a fallback whilst we are wating other data arrive.
+*/
+
 export default EventsPage;
 
-export const loader = async () => {
-  const responce = await fetch("http://localhost:8080/events");
+const loadEvents = async()=>{
+    const responce = await fetch("http://localhost:8080/events");
 
   if (!responce.ok) {
     // return {isError:true , message: "Could not fetch events"} "ex.1"
@@ -29,8 +56,35 @@ export const loader = async () => {
     // return json({message:'Could not fetch events.'},{status:500})
     /* json() is a function that creates a responce object that includes data in the json format */
   } else {
-    return responce;
+    const resDeta = await responce.json();
+    return resDeta.events;
   }
+}
+
+/* defer Example :- 
+  import { defer } from "react-router-dom";
+
+  "execute on loader"
+  export const loader =() => {
+    return defer({
+      events: loadEvents()
+    })
+  };
+
+  "The idea behiend "defer" is that we have a value that will eventually resolve
+  to another value which is defenation of a promise.
+  And that we want to load a component and render a component even though that future
+  value is not there yet.
+  so load events returns a promise. it must returns a promise
+  and it does. And we store thet promise under the 
+  events key in this object which we pass to "defer""
+
+*/
+
+export const loader =() => {
+    return {
+      events : loadEvents(),
+    }
 };
 
 /* 
