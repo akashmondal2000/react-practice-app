@@ -1,21 +1,33 @@
-import { useRouteLoaderData, redirect } from "react-router";
+import { Suspense } from "react";
+import { useRouteLoaderData, redirect, Await } from "react-router";
 import EventItem from "../components/EventItem";
+import EventsList from "../components/EventsList";
 
 const EventDetailPage = () => {
-  const data = useRouteLoaderData("event-detail");
+  const { event, events } = useRouteLoaderData("event-detail");
 
   return (
     <>
-      <EventItem event={data.event} />
+      <Suspense fallback={<p style={{textAlign:"center"}}>Loading Details....</p>}>
+        <Await resolve={event}>
+          {(loadEvent) => <EventItem event={loadEvent} />}
+        </Await>
+      </Suspense>
+
+      <Suspense fallback={<p style={{textAlign:"center"}}>Loading list.....</p>}>
+        <Await resolve={events}>
+          {(loadEvents) => <EventsList events={loadEvents} />}
+        </Await>
+      </Suspense>
     </>
   );
 };
 
 export default EventDetailPage;
 
-export const loader = async ({ request, params }) => {
-  const id = params.eventId;
-  const response = await fetch("http://localhost:8080/events/"+id);
+/*This function for event details*/
+const loadEvent = async (id) => {
+  const response = await fetch("http://localhost:8080/events/" + id);
 
   if (!response.ok) {
     throw new Response(
@@ -27,13 +39,41 @@ export const loader = async ({ request, params }) => {
       },
     );
   } else {
-    return response;
+    const resData = await response.json();
+    return resData.event;
   }
 };
 
-export const action = async ({ params,request }) => {
+/* this function for event list*/
+const loadEvents = async () => {
+  const responce = await fetch("http://localhost:8080/events");
+
+  if (!responce.ok) {
+    // return {isError:true , message: "Could not fetch events"} "ex.1"
+    throw new Response(JSON.stringify({ message: "Could not fetch events." }), {
+      status: 500,
+    });
+
+    // return json({message:'Could not fetch events.'},{status:500})
+    /* json() is a function that creates a responce object that includes data in the json format */
+  } else {
+    const resDeta = await responce.json();
+    return resDeta.events;
+  }
+};
+
+export const loader = async ({ request, params }) => {
+  const id = params.eventId;
+
+  return {
+    event: await loadEvent(id),
+    events: loadEvents(),
+  };
+};
+
+export const action = async ({ params, request }) => {
   const eventId = params.eventId;
-  const response = await fetch("http://localhost:8080/events/"+eventId,{
+  const response = await fetch("http://localhost:8080/events/" + eventId, {
     // method:'DELETE',
     method: request.method,
   });
@@ -44,5 +84,5 @@ export const action = async ({ params,request }) => {
     });
   }
 
-  return redirect('/events')
+  return redirect("/events");
 };
